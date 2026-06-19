@@ -20,7 +20,8 @@ const Productos = sequelize.define('Productos', {
         type: DataTypes.INTEGER
     },
     estado: {
-        type: DataTypes.TINYINT
+        type: DataTypes.INTEGER,
+        defaultValue: 1
     },
     marca: {
         type: DataTypes.STRING,
@@ -34,6 +35,7 @@ const Productos = sequelize.define('Productos', {
     }
 }, {
     tableName: 'Productos',
+    freezeTableName: true,
     timestamps: false
 });
 
