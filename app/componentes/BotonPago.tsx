@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { registrarPago } from '../servicios/api';
 import { useContextCarrito } from '../Providers/ProvidersCarrito';
+import { toast } from 'sonner';
 
 export default function BotonPago() {
   const [procesando, setProcesando] = useState(false);
@@ -15,14 +16,21 @@ export default function BotonPago() {
     0
   );
 
-  const ejecutarPago = () => {
-    if (productosValidos.length === 0) return alert('El carrito está vacío');
+  const ejecutarPago = async () => {
+    if (productosValidos.length === 0) {
+      toast.error('El carrito está vacío');
+      return;
+    }
 
     const usuarioJson = localStorage.getItem('usuario');
-    if (!usuarioJson) return alert('Por favor, inicia sesión para pagar.');
+    if (!usuarioJson) {
+      toast.error('Por favor, inicia sesión para pagar.');
+      return;
+    }
     const usuario = JSON.parse(usuarioJson);
 
     setProcesando(true);
+    const loadingToast = toast.loading('Procesando transacción...');
 
     const datosCompra = {
       idUsuario: usuario.idUsuarios,
@@ -34,17 +42,18 @@ export default function BotonPago() {
       })),
     };
 
-    registrarPago(datosCompra)
-      .then((respuesta: any) => {
-        alert(respuesta.mensaje);
-      })
-      .catch((err) => {
-        console.error(err);
-        alert('Ocurrió un error al procesar la transacción.');
-      })
-      .finally(() => {
-        setProcesando(false);
-      });
+    try {
+      const respuesta = await registrarPago(datosCompra);
+      toast.dismiss(loadingToast);
+      toast.success(respuesta.mensaje || '¡Compra realizada con éxito!');
+    } catch (err: any) {
+      console.error(err);
+      toast.dismiss(loadingToast);
+      const msg = err.response?.data?.error || 'Ocurrió un error al procesar la transacción.';
+      toast.error(msg);
+    } finally {
+      setProcesando(false);
+    }
   };
 
   return (
@@ -57,7 +66,7 @@ export default function BotonPago() {
           : 'bg-green-600 hover:bg-green-500 text-black shadow-lg'
         }`}
     >
-      {procesando ? 'Procesando Transacción...' : `Pagar Orden (L. ${totalCalculado.toFixed(2)})`}
+      {procesando ? 'Procesando...' : `Pagar Orden (L. ${totalCalculado.toFixed(2)})`}
     </button>
   );
 }

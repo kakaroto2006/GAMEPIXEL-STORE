@@ -5,6 +5,7 @@ import { Vista } from '../models/Vista';
 import { ICarritoDetalle } from '../models/ICarritoDetalle';
 import { contextCarrito } from '../Contexts/ContextCarrito';
 import { IProductos } from '../models/IProductos';
+import { toast } from 'sonner';
 
 export default function ProviderCarrito({ children }: Vista) {
   const [carrito, setCarrito] = useState<ICarritoDetalle[]>([]);
@@ -55,7 +56,7 @@ export default function ProviderCarrito({ children }: Vista) {
       });
 
       if (response.ok) {
-        alert('Producto agregado al carrito');
+        toast.info('Producto agregado al carrito');
         obtenerProductosCarrito();
       }
     } catch (error) {
@@ -84,7 +85,7 @@ export default function ProviderCarrito({ children }: Vista) {
       });
       if (response.ok) {
         obtenerProductosCarrito();
-        alert('Producto eliminado correctamente');
+        toast.info('Producto eliminado correctamente');
       }
     } catch (error) {
       console.error('Error al eliminar:', error);

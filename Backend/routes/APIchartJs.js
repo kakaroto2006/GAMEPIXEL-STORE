@@ -34,8 +34,26 @@ router.post('/pagar', async (req, res) => {
     }
 });
 
-router.get('/prueba-ventas', async (req, res) => {
-    res.json({ mensaje: "Si esto sale, la ruta es funcional" });
+router.get('/grafica-ventas', async (req, res) => {
+    try {
+        const query = `
+            SELECT 
+                DATE(fecha_venta) as fecha, 
+                SUM(total) as total_ventas 
+            FROM Venta_Usuario 
+            GROUP BY DATE(fecha_venta)
+            ORDER BY fecha ASC
+            LIMIT 7;
+        `;
+
+        const results = await sequelize.query(query, { 
+            type: sequelize.QueryTypes.SELECT 
+        });
+
+        res.json(results);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 router.get('/grafica-stock', async (req, res) => {
