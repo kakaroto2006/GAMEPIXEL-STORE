@@ -109,7 +109,7 @@ async function actualizarCantidad(idDetalle: number, nuevaCantidad: number) {
 }, []);
 
   return (
-    <contextCarrito.Provider value={{ carrito, agregarCarrito, obtenerProductosCarrito, eliminarDelCarrito }}>
+    <contextCarrito.Provider value={{ carrito, actualizarCantidad,agregarCarrito, obtenerProductosCarrito, eliminarDelCarrito }}>
       {children}
     </contextCarrito.Provider>
   )

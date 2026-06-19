@@ -9,6 +9,7 @@ export default function RootLayout({
 }) {
   return (
     <div>
+      
       <ProvidersCarrito>
         <ProvidersProductos>
           <NavBar/>

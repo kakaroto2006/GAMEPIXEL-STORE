@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { useContextCarrito } from '@/app/Providers/ProvidersCarrito';
 
 export default function Page() {
-  const { carrito, obtenerProductosCarrito, eliminarDelCarrito } = useContextCarrito();
+  const { carrito, obtenerProductosCarrito, actualizarCantidad, eliminarDelCarrito } = useContextCarrito();
 
   useEffect(() => {
     obtenerProductosCarrito();
@@ -49,8 +49,35 @@ export default function Page() {
 
                   <div className="flex items-center space-x-6">
                     <div className="flex items-center bg-blue-950 rounded-lg">
-                      <span className="px-4 py-2">{item.cantidad}</span>
-                    </div>
+  {/* Botón de restar */}
+  <button 
+    onClick={() => {
+        // Evitamos que la cantidad sea menor a 1
+        if (item.cantidad > 1) {
+            actualizarCantidad(item.idDetalle_carrito, item.cantidad - 1);
+        }
+    }}
+    className="px-3 py-1 hover:bg-blue-800 rounded-l-lg transition"
+  >
+    -
+  </button>
+
+  {/* Contador */}
+  <span className="px-4 py-2 font-bold text-white">
+    {item.cantidad}
+  </span>
+
+  {/* Botón de sumar */}
+  <button 
+    onClick={() => {
+        // Aumentamos la cantidad
+        actualizarCantidad(item.idDetalle_carrito, item.cantidad + 1);
+    }}
+    className="px-3 py-1 hover:bg-blue-800 rounded-r-lg transition"
+  >
+    +
+  </button>
+</div>
 
                     <p className="text-white font-semibold">
                       L. {(item.producto?.precio * item.cantidad).toFixed(2)}
