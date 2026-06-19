@@ -2,13 +2,18 @@
 import React from 'react'
 import Link from 'next/link'
 import { useContextProductos } from '../Providers/ProvidersProductos'
+import { useContextUsuario } from '../Providers/ProvidersUsuarios'
 import Image from 'next/image';
+import { useRouter } from 'next/navigation'
+import Perfil from './Perfil'
 
 export default function NavBar() {
-  const { producto } = useContextProductos()
+  const { producto} = useContextProductos()
+  const { usuario, cerrarSesion } = useContextUsuario()
+const router = useRouter()
 
   return (
-    <nav className="bg-black text-white py-2 px-12 flex justify-between items-center border-b border-gray-800">
+    <nav className="bg-black text-white py-2 px-12 flex justify-between items-center">
             
         <Link href="MenuPrincipal">
   <Image 
@@ -19,36 +24,29 @@ export default function NavBar() {
     priority      
   />
 </Link>
-    
-
+  
       {/* Navegación centralizada */}
       <div className="flex items-center gap-8">
-        <Link href="/" className="hover:text-green-500 transition-colors uppercase text-xs font-bold tracking-widest">
-          Home
+        <Link href="/MenuPrincipal" className="hover:text-green-500 transition-colors uppercase text-xs font-bold tracking-widest">
+          Catalago
         </Link>
-        <Link href="/Productos" className="hover:text-green-500 transition-colors uppercase text-xs font-bold tracking-widest">
+        <Link href="/favoritos" className="hover:text-green-500 transition-colors uppercase text-xs font-bold tracking-widest">
           Favoritos
         </Link>
-        <Link href="/Blog" className="hover:text-green-500 transition-colors uppercase text-xs font-bold tracking-widest">
+        <Link href="/Resenias" className="hover:text-green-500 transition-colors uppercase text-xs font-bold tracking-widest">
           Blogs
         </Link>
-        <Link href="/Contact" className="hover:text-green-500 transition-colors uppercase text-xs font-bold tracking-widest">
-          Contactanos
-        </Link>
-      </div>
 
-      {/* Iconos de acción */}
+      </div>
       <div className="flex items-center gap-6">
-        {/* Aquí puedes añadir iconos de búsqueda/usuario/carrito */}
-        <span className="text-gray-400 hover:text-white cursor-pointer">Busqueda</span>
-        <span className="text-gray-400 hover:text-white cursor-pointer">Perfil</span>
-        
-        <Link href="/Carrito" className="relative text-gray-400 hover:text-green-500 transition-colors">
+       <Link href="/carrito" className="relative text-gray-400 hover:text-green-500 transition-colors">
           Carrito
-          <span className="absolute -top-2 -right-2 bg-green-500 text-black text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-            {producto.length}
-          </span>
         </Link>
+       
+       <Perfil/>
+        
+     
+        
       </div>
     </nav>
   )

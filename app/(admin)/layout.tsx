@@ -1,6 +1,6 @@
-import NavBar from "../componentes/NavBar";
+
 import ProvidersProductos from "@/app/Providers/ProvidersProductos";
-import ProvidersCarrito from "../Providers/ProvidersCarrito";
+import NavBarAdmin from "../componentes/NavBarAdmin";
 
 export default function RootLayout({
   children,
@@ -9,12 +9,10 @@ export default function RootLayout({
 }) {
   return (
     <div>
-      <ProvidersCarrito>
         <ProvidersProductos>
-          <NavBar/>
+          <NavBarAdmin/>
           {children}
         </ProvidersProductos>
-        </ProvidersCarrito>
    </div>
   );
 }

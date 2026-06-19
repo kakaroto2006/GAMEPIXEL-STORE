@@ -1,30 +1,95 @@
 'use client'
+
 import React from 'react'
+import { useRouter } from 'next/navigation'
 import { useContextProductos } from '../Providers/ProvidersProductos'
-import { IProductos } from '../models/IProductos';
+import { useContextCarrito } from '../Providers/ProvidersCarrito'
 
-// Cambiamos a { item }: { item: IProductos } para que coincida con la prop enviada
-export default function CardProductos({ item }: { item: IProductos }) {
-  const { eliminarProducto } = useContextProductos();
+export default function CardProductos() {
+  const router = useRouter()
 
+  const { producto, categoriaActiva } = useContextProductos()
+  // ✅ CORRECCIÓN 1: Agregar los paréntesis al hook
+  const { agregarCarrito } = useContextCarrito() 
+
+  const productosFiltrados =
+    categoriaActiva === 'Todas'
+      ? producto
+      : producto.filter(
+          (p) =>
+            (p.categoria?.nombre_categoria || 'Sin categoría') === categoriaActiva
+        )
+  
   return (
-    <div className="bg-gray-900 border border-gray-800 p-4 rounded-xl shadow-lg transition-transform hover:scale-105 duration-300">
-      
-      <img 
-        src={item.imagen_product} 
-        alt={item.nombre_producto} 
-        className="w-full h-40 object-cover rounded-lg mb-4" 
-      />
-      
-      <h3 className="font-bold text-lg text-white truncate">{item.nombre_producto}</h3>
-      <p>{item.marca} - {item.categoria?.nombre_categoria}</p>
-      <p className="text-green-400 font-bold mt-1">L. {item.precio}</p>
-      
-      <button 
-        className="bg-green-600 hover:bg-green-500 text-black font-bold px-4 py-2 mt-4 rounded-md w-full transition-colors uppercase tracking-wider text-sm"
-      >
-        Agregar al Carrito
-      </button>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      {productosFiltrados.map((item) => (
+        <div
+          key={item.idProductos}
+          className="
+            bg-gray-900
+            border border-gray-800
+            rounded-2xl
+            overflow-hidden
+            shadow-lg
+            hover:border-green-500
+            hover:-translate-y-2
+            transition-all
+            duration-300
+          "
+        >
+          {/* ZONA QUE ABRE EL DETALLE */}
+          <div
+            onClick={() => router.push(`./detalle-producto/${item.idProductos}`)}
+            className="cursor-pointer"
+          >
+            <div className="w-full h-64 overflow-hidden">
+              <img
+                src={item.imagen_product}
+                alt={item.nombre_producto}
+                className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+              />
+            </div>
+
+            <div className="p-5">
+              <h3 className="text-white text-xl font-bold mb-2">
+                {item.nombre_producto}
+              </h3>
+
+              <p className="inline-block bg-white/10 text-green-400 text-xs px-3 py-1 rounded-full mb-4">
+                {item.marca}
+              </p>
+
+              <h2 className="text-green-500 text-xl font-extrabold">
+                L. {item.precio}
+              </h2>
+            </div>
+          </div>
+
+   
+          <div className="px-5 pb-5">
+            <button
+              
+              onClick={() => {
+    console.log("¡Clic realizado!");
+    agregarCarrito(item);
+  }}
+              className="
+                w-full
+                bg-green-600
+                hover:bg-green-500
+                text-black
+                font-bold
+                py-2
+                rounded-xl
+                transition
+                uppercase
+              "
+            >
+              Agregar al carrito
+            </button>
+          </div>
+        </div>
+      ))}
     </div>
   )
 }

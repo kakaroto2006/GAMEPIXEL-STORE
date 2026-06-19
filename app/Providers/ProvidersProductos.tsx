@@ -1,11 +1,13 @@
 'use client'
 import React, { useEffect, useState, useContext } from 'react';
-import { contextProductos } from '../Contexts/ContextProductos'; // Importa el contexto
+import { contextProductos } from '../Contexts/ContextProductos';
+import { Vista } from '../models/Vista';
 import { IProductos } from '../models/IProductos';
 
-export default function ProvidersProductos({ children }: { children: React.ReactNode }) {
+export default function ProvidersProductos({ children }: Vista) {
   const [producto, setProducto] = useState<IProductos[]>([]);
   const API = "http://localhost:8080/productos";
+  const [categoriaActiva, setCategoriaActiva] = useState('Todas')
 
   async function obtenerProductos() {
     try {
@@ -17,22 +19,66 @@ export default function ProvidersProductos({ children }: { children: React.React
     }
   }
 
-  async function agregarProducto(producto: IProductos, opcion: number) {
-    const url = opcion === 1 ? API : `${API}/${producto.idProductos}`;
-    const method = opcion === 1 ? "POST" : "PUT";
+async function obtenerProductoPorId(id: number | string) {
+  try {
+    const res = await fetch(`${API}/${id}`)
+    const data = await res.json()
+    
+    console.log("RESPUESTA DETALLE API:", data) // <-- Revisa esto en la consola del navegador
+    
+    // Si tu backend envuelve el producto en .data, devuélvelo así:
+    return data.data ? data.data : data;
+  } catch (error) {
+    console.log("Error al obtener producto por id:", error)
+    return null
+  }
+}
 
-    await fetch(url, {
+ async function agregarProducto(producto: IProductos, opcion: number) {
+  try {
+    const url = opcion === 1
+      ? API
+      : `${API}/${producto.idProductos}`
+
+    const method = opcion === 1 ? "POST" : "PUT"
+
+    const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(producto),
-    });
-    obtenerProductos(); 
-  }
+    })
 
-  async function eliminarProducto(id: number) {
-    await fetch(`${API}/${id}`, { method: "DELETE" });
-    obtenerProductos(); 
+    const data = await res.json()
+
+    if (!res.ok) {
+      console.log("ERROR BACKEND:", data)
+      return false
+    }
+
+    console.log("OK:", data)
+
+    await obtenerProductos()
+
+    return true
+
+  } catch (error) {
+    console.log("ERROR FETCH:", error)
+    return false
   }
+}
+
+  async function desactivarProducto(id: number) {
+
+  await fetch(
+    `http://localhost:8080/productos/desactivar/${id}`,
+    {
+      method: 'PUT'
+    }
+  )
+
+  obtenerProductos()
+
+}
 
   useEffect(() => {
     obtenerProductos();
@@ -44,8 +90,11 @@ export default function ProvidersProductos({ children }: { children: React.React
       value={{
         producto,
         obtenerProductos,
+        obtenerProductoPorId,
         agregarProducto,
-        eliminarProducto,
+        desactivarProducto,
+        categoriaActiva,
+        setCategoriaActiva
       }}
     >
       {children}
