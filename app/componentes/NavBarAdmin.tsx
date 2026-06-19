@@ -24,6 +24,17 @@ const router = useRouter()
     priority      
   />
 </Link>
+    <div className="flex items-center gap-8">
+      <Link href="/Administracion" className="hover:text-green-500 transition-colors uppercase text-xs font-bold tracking-widest">
+          Administracion
+        </Link>
+        <Link href="/ChartJS" className="hover:text-green-500 transition-colors uppercase text-xs font-bold tracking-widest">
+          Ventas
+        </Link>
+        <Link href="/ChartJSProduct" className="hover:text-green-500 transition-colors uppercase text-xs font-bold tracking-widest">
+          Productos
+        </Link>
+        </div>
 
 <Perfil/>
     </nav>

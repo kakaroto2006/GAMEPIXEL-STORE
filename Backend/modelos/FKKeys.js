@@ -5,6 +5,7 @@ const Resenia = require('./Resenia')
 const Usuario = require('./Usuarios')
 const DetalleCarrito = require('./DetalleCarrito'); 
 const Carrito=require('./Carrito')
+const Favoritos = require('./Favoritos')
 
 Productos.belongsTo(Categoria, {
   foreignKey: 'Categoria_idCategoria',
@@ -54,4 +55,14 @@ Usuario.hasOne(Carrito, {
 Carrito.belongsTo(Usuario, { 
     foreignKey: 'Usuarios_idUsuarios', 
     as: 'usuario' 
+});
+
+Favoritos.belongsTo(Productos, {
+  foreignKey: 'Productos_idProductos',
+  as: 'producto'
+});
+
+Productos.hasMany(Favoritos, {
+  foreignKey: 'Productos_idProductos',
+  as: 'favoritos'
 });

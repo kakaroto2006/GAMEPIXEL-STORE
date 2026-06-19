@@ -1,92 +1,82 @@
-'use client'
-import React, { useContext, useEffect } from 'react'
+'use client';
+
+import React, { useContext, useEffect, useState } from 'react';
 import { Vista } from '../models/Vista';
-import { useState } from 'react';
 import { ICarritoDetalle } from '../models/ICarritoDetalle';
 import { contextCarrito } from '../Contexts/ContextCarrito';
 import { IProductos } from '../models/IProductos';
 
-
 export default function ProviderCarrito({ children }: Vista) {
-  
   const [carrito, setCarrito] = useState<ICarritoDetalle[]>([]);
 
-async function obtenerProductosCarrito() {
+  const obtenerUsuario = () => {
     const usuarioJson = localStorage.getItem('usuario');
-    if (!usuarioJson) return;
+    return usuarioJson ? JSON.parse(usuarioJson) : null;
+  };
 
-    try {
-        const usuario = JSON.parse(usuarioJson);
-        // CAMBIO: usa idUsuarios, no id
-        const idReal = usuario.idUsuarios; 
+ async function obtenerProductosCarrito() {
+  const usuario = obtenerUsuario();
 
-        if (!idReal) return;
+  console.log("Usuario:", usuario);
 
-        const response = await fetch(`http://localhost:8080/carrito/${idReal}`);
-        
-        if (response.ok) {
-            const data = await response.json();
-            // Esto es crucial: verifica si data.data es lo que esperas
-            setCarrito(data.data || []);
-        }
-    } catch (error) {
-        console.log('Error obteniendo carrito:', error);
-    }
+  if (!usuario?.idUsuarios) {
+    console.log("No existe idUsuarios");
+    return;
+  }
+
+  console.log(`http://localhost:8080/carrito/${usuario.idUsuarios}`);
+
+  const response = await fetch(
+    `http://localhost:8080/carrito/${usuario.idUsuarios}`
+  );
+
+  console.log("Status:", response.status);
+
+  const data = await response.json();
+
+  console.log("Respuesta:", data);
+
+  setCarrito(data.data || []);
 }
 
   async function agregarCarrito(producto: IProductos) {
-  const usuarioJson = localStorage.getItem('usuario');
-  
-  if (!usuarioJson) {
-      alert("Por favor, inicia sesión.");
-      return;
-  }
+    const usuario = obtenerUsuario();
+    if (!usuario) return alert("Por favor, inicia sesión.");
 
-  const usuario = JSON.parse(usuarioJson);
-  const idReal = usuario.idUsuarios;
-
-  const payload = {
-  Usuarios_idUsuarios: idReal,
-  idProducto: producto.idProductos,
-  cantidad: 1
-};
-
-
-  try {
-    const response = await fetch('http://localhost:8080/carrito', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-
-    if (response.ok) {
-      alert('Producto agregado al carrito');
-      obtenerProductosCarrito();
-    } else {
-      const errorData = await response.json();
-      console.error("Error del servidor:", errorData);
-    }
-  } catch (error) {
-    console.error("Error de red:", error);
-  }
-}
-
-async function actualizarCantidad(idDetalle: number, nuevaCantidad: number) {
     try {
+      const response = await fetch('http://localhost:8080/carrito', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          Usuarios_idUsuarios: usuario.idUsuarios,
+          idProducto: producto.idProductos,
+          cantidad: 1
+        }),
+      });
 
-        const response = await fetch(`http://localhost:8080/carrito/${idDetalle}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nuevaCantidad }),
-        });
-
-        if (response.ok) {
-            obtenerProductosCarrito(); 
-        }
+      if (response.ok) {
+        alert('Producto agregado al carrito');
+        obtenerProductosCarrito();
+      }
     } catch (error) {
-        console.error("Error al actualizar:", error);
+      console.error("Error al agregar producto:", error);
     }
-}
+  }
+
+  async function actualizarCantidad(idDetalle: number, nuevaCantidad: number) {
+    try {
+      const response = await fetch(`http://localhost:8080/carrito/${idDetalle}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nuevaCantidad }),
+      });
+
+      if (response.ok) obtenerProductosCarrito();
+    } catch (error) {
+      console.error("Error al actualizar:", error);
+    }
+  }
+
   async function eliminarDelCarrito(idDetalle: number) {
     try {
       const response = await fetch(`http://localhost:8080/carrito/${idDetalle}`, {
@@ -97,22 +87,21 @@ async function actualizarCantidad(idDetalle: number, nuevaCantidad: number) {
         alert('Producto eliminado correctamente');
       }
     } catch (error) {
-      console.log('Error al eliminar:', error);
+      console.error('Error al eliminar:', error);
     }
   }
 
   useEffect(() => {
-  const usuarioJson = localStorage.getItem('usuario');
-  if (usuarioJson) {
-     obtenerProductosCarrito(); 
-  }
-}, []);
+    if (localStorage.getItem('usuario')) {
+      obtenerProductosCarrito();
+    }
+  }, []);
 
   return (
-    <contextCarrito.Provider value={{ carrito, actualizarCantidad,agregarCarrito, obtenerProductosCarrito, eliminarDelCarrito }}>
+    <contextCarrito.Provider value={{ carrito, actualizarCantidad, agregarCarrito, obtenerProductosCarrito, eliminarDelCarrito }}>
       {children}
     </contextCarrito.Provider>
-  )
+  );
 }
 
   export function useContextCarrito() {

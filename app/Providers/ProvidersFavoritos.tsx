@@ -1,5 +1,6 @@
-'use client'
-import React, { useContext, useState, useEffect } from 'react';
+'use client';
+
+import React, { useContext, useState } from 'react';
 import { contextFavoritos } from '../Contexts/ContextFavoritos';
 import { IFavoritos } from '../models/IFavoritos';
 import { IProductos } from '../models/IProductos';
@@ -8,59 +9,59 @@ import { Vista } from '../models/Vista';
 export default function ProviderFavoritos({ children }: Vista) {
   const [favoritos, setFavoritos] = useState<IFavoritos[]>([]);
 
-  async function obtenerFavoritos() {
+  const obtenerUsuario = () => {
     const usuarioJson = localStorage.getItem('usuario');
-    if (!usuarioJson) return;
+    return usuarioJson ? JSON.parse(usuarioJson) : null;
+  };
+
+  async function obtenerFavoritos() {
+    const usuario = obtenerUsuario();
+    if (!usuario?.idUsuarios) return;
 
     try {
-      const usuario = JSON.parse(usuarioJson);
-      const response = await fetch(`http://localhost:8080/favoritos/usuario/${usuario.idUsuarios}`);
+      const response = await fetch(`http://localhost:8080/favoritos/${usuario.idUsuarios}`);
       if (response.ok) {
         const data = await response.json();
-        setFavoritos(data || []);
+        setFavoritos(Array.isArray(data) ? data : (data.data || []));
       }
     } catch (error) {
-      console.error("Error al obtener favoritos:", error);
+      console.error('Error al obtener favoritos:', error);
     }
   }
 
   async function agregarAFavoritos(producto: IProductos) {
-    const usuarioJson = localStorage.getItem('usuario');
-    if (!usuarioJson) return alert("Inicia sesión");
+    const usuario = obtenerUsuario();
+    if (!usuario) return alert("Inicia sesión para guardar favoritos.");
 
-    const usuario = JSON.parse(usuarioJson);
     try {
-      const response = await fetch('http://localhost:8080/favoritos/agregar', {
+      const response = await fetch('http://localhost:8080/favoritos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-            Usuarios_idUsuarios: usuario.idUsuarios, 
-            Productos_idProductos: producto.idProductos 
+          Usuarios_idUsuarios: usuario.idUsuarios, 
+          Productos_idProductos: producto.idProductos 
         }),
       });
-
-      // AGREGA ESTO:
-      const data = await response.json();
-      console.log("Respuesta del servidor:", data);
 
       if (response.ok) {
         obtenerFavoritos();
       } else {
-        alert("Error: " + (data.mensaje || "No se pudo agregar"));
+        const error = await response.json();
+        console.error("Error al añadir:", error);
       }
     } catch (error) {
-      console.error("Error completo:", error);
+      console.error("Error de red:", error);
     }
-}
+  }
 
   async function eliminarFavorito(idFavorito: number) {
     try {
-      await fetch(`http://localhost:8080/favoritos/eliminar/${idFavorito}`, {
+      const response = await fetch(`http://localhost:8080/favoritos/${idFavorito}`, {
         method: 'DELETE',
       });
-      obtenerFavoritos();
+      if (response.ok) obtenerFavoritos();
     } catch (error) {
-      console.error("Error al eliminar:", error);
+      console.error("Error al eliminar favorito:", error);
     }
   }
 
@@ -71,5 +72,7 @@ export default function ProviderFavoritos({ children }: Vista) {
   );
 }
 
+
+
 export const useContextFavoritos = () => 
-    useContext(contextFavoritos);
+            useContext(contextFavoritos);

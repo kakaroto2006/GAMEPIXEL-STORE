@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const sequelize = require('../conexion/db');
 
 const Carrito = require('../modelos/Carrito');
 const DetalleCarrito = require('../modelos/DetalleCarrito');
@@ -9,21 +10,21 @@ router.get('/carrito/:idUsuario', async (req, res) => {
   try {
     const { idUsuario } = req.params;
 
-    const carrito = await Carrito.findOne({
+    let carrito = await Carrito.findOne({
       where: { Usuarios_idUsuarios: idUsuario }
     });
 
     if (!carrito) {
-      return res.status(404).json({ message: 'El usuario no tiene un carrito activo', data: [] });
+      return res.status(200).json({
+        message: 'Carrito vacío',
+        data: [] 
+      });
     }
 
     const detalles = await DetalleCarrito.findAll({
-  where: { Carrito_idCarrito: carrito.idCarrito },
-  include: [{ 
-    model: Productos,
-    as: 'producto'
-  }]
-});
+      where: { Carrito_idCarrito: carrito.idCarrito },
+      include: [{ model: Productos, as: 'producto' }]
+    });
 
     return res.status(200).json({
       message: 'Carrito obtenido correctamente',
@@ -38,7 +39,7 @@ router.get('/carrito/:idUsuario', async (req, res) => {
 
 router.post('/carrito', async (req, res) => {
   try {
-    // CAMBIO AQUÍ: Recibimos 'Usuarios_idUsuarios' en lugar de 'idUsuario'
+
     const { Usuarios_idUsuarios, idProducto, cantidad } = req.body;
 
     console.log("Datos recibidos:", { Usuarios_idUsuarios, idProducto, cantidad });
@@ -95,7 +96,6 @@ router.put('/carrito/:idDetalle', async (req, res) => {
   }
 });
 
-
 router.delete('/carrito/:idDetalle', async (req, res) => {
   try {
     const { idDetalle } = req.params;
@@ -118,4 +118,6 @@ router.delete('/carrito/:idDetalle', async (req, res) => {
     return res.status(500).json({ message: 'Error al eliminar el producto', error: error.message });
   }
 });
+
+
 module.exports = router;

@@ -24,9 +24,8 @@ async function obtenerProductoPorId(id: number | string) {
     const res = await fetch(`${API}/${id}`)
     const data = await res.json()
     
-    console.log("RESPUESTA DETALLE API:", data) // <-- Revisa esto en la consola del navegador
-    
-    // Si tu backend envuelve el producto en .data, devuélvelo así:
+    console.log("RESPUESTA DETALLE API:", data)
+  
     return data.data ? data.data : data;
   } catch (error) {
     console.log("Error al obtener producto por id:", error)

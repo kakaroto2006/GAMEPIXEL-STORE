@@ -53,15 +53,12 @@ export default function Page() {
         </div>
 
       </section>
-
-      {/* ================= ZONA DE CATEGORÍAS ================= */}
       
 
       <section className="py-16">
   
   <div className="max-w-7xl mx-auto px-7">
 
-    {/* título */}
     <div className="mb-4">
       <h2 className="text-3xl font-bold text-white tracking-wider text-center">
         EXPLORA NUESTRO CATÁLOGO

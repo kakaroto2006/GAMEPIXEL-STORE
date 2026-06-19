@@ -41,8 +41,8 @@ export default function UsuarioProvider({ children }: Vista) {
     }
   }
 
-  // ================= REGISTRO =================
-  const registro = async (datos: IUsuarios): Promise<boolean> => {
+
+  const registro = async (datos: IUsuarios) => {
     try {
       const res = await fetch(`${API}/registrar`, {
         method: 'POST',

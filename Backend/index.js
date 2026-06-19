@@ -6,6 +6,8 @@ const APIproductos = require('./routes/APIproductos')
 const UsuariosValidacion = require('./routes/UsuarioValidacion')
 const APIresenias = require('./routes/APIresenia')
 const APIcarrito = require('./routes/APIcarrito')
+const APIfavoritos = require('./routes/APIfavoritos')
+const APIchartJs = require('./routes/APIchartJs')
 require('./modelos/FKKeys')
 
 const app = express();
@@ -20,6 +22,8 @@ app.use('/',APIproductos);
 app.use('/',UsuariosValidacion);
 app.use('/',APIresenias);
 app.use('/',APIcarrito);
+app.use('/',APIfavoritos);
+app.use('/',APIchartJs);
 
 
 

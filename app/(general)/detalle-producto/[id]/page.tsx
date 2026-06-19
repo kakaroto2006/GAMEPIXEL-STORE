@@ -2,14 +2,14 @@
 
 import { useParams } from 'next/navigation'
 import { useContextProductos } from '@/app/Providers/ProvidersProductos'
+import { useContextCarrito } from '@/app/Providers/ProvidersCarrito'
 
 export default function DetalleProducto() {
   const params = useParams()
   const { producto } = useContextProductos()
+  const { agregarCarrito } = useContextCarrito()
 
-  const item = producto.find(
-    p => p.idProductos === Number(params.id)
-  )
+  const item = producto.find(p => p.idProductos === Number(params.id))
 
   if (!item) {
     return (
@@ -20,146 +20,54 @@ export default function DetalleProducto() {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white p-8">
-
-      <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-10">
-
-        {/* Imagen */}
+    <main className="min-h-screen bg-black text-white p-4 md:p-8">
+      <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 md:gap-10">
+        
         <div className="bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800">
-
           <img
             src={item.imagen_product}
             alt={item.nombre_producto}
-            className="w-full h-[700px] object-cover"
+            className="w-full h-80 md:h-500px object-cover"
           />
-
         </div>
 
-        {/* Información */}
         <div className="space-y-6">
+          <h1 className="text-3xl md:text-5xl font-bold">{item.nombre_producto}</h1>
 
-          <h1 className="text-5xl font-bold">
-            {item.nombre_producto}
-          </h1>
-
-          <span className="inline-block px-4 py-2 bg-zinc-900 rounded-full text-sm">
-            {item.categoria?.nombre_categoria}
-          </span>
-
-          <div className="flex items-center gap-2">
-
-            <span className="text-red-600 text-xl">
-              ★★★★★
-            </span>
-
-            <span className="text-gray-400">
-              4.9 (120 reseñas)
-            </span>
-
+          <div className="flex flex-wrap gap-2">
+            <span className="px-4 py-2 bg-zinc-900 rounded-full text-sm">{item.categoria?.nombre_categoria}</span>
+            <span className="px-4 py-2 bg-zinc-900 rounded-full text-sm">{item.marca}</span>
           </div>
 
-          <h2 className="text-5xl font-bold text-red-600">
-            ${item.precio}
-          </h2>
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-red-600">★★★★★</span>
+            <span className="text-gray-400">4.9 (120 reseñas)</span>
+          </div>
 
-          <p className="text-gray-400 text-lg leading-relaxed">
+          <h2 className="text-3xl md:text-5xl font-bold text-green-600">L. {item.precio}</h2>
+
+          <p className="text-gray-400 text-base md:text-lg leading-relaxed">
             {item.descripcion_product}
           </p>
 
-          <span className="inline-block bg-yellow-400 text-black font-semibold px-4 py-2 rounded-full">
+          <span className="inline-block bg-yellow-400 text-black font-semibold px-4 py-2 rounded-full text-sm">
             Stock disponible: {item.stock}
           </span>
 
-          {/* Beneficios */}
-
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 space-y-4">
-
-            <div>
-              🚚 Envío gratis en compras superiores a $50
-            </div>
-
-            <div>
-              🔒 Pago seguro
-            </div>
-
-            <div>
-              📦 Entrega rápida
-            </div>
-
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 space-y-3 text-sm md:text-base">
+            <div>🚚 Envío Rápido</div>
+            <div>🔒 Pago seguro</div>
+            <div>📦 Seguimiento de pedidos</div>
           </div>
 
           <button
-            className="
-              w-full
-              bg-red-600
-              hover:bg-red-700
-              py-4
-              rounded-xl
-              font-bold
-              transition
-            "
+            onClick={() => agregarCarrito(item)}
+            className="w-full bg-green-600 hover:bg-green-700 py-4 rounded-xl font-bold transition duration-300"
           >
             Agregar al carrito
           </button>
-
         </div>
-
       </div>
-
-      {/* Reseñas */}
-
-      <section className="max-w-7xl mx-auto mt-16">
-
-        <h2 className="text-3xl font-bold mb-6">
-          Reseñas
-        </h2>
-
-        <div className="grid md:grid-cols-2 gap-6">
-
-          <div className="bg-zinc-900 p-5 rounded-xl border border-zinc-800">
-
-            <div className="flex justify-between mb-3">
-
-              <h3 className="font-bold">
-                Usuario 1
-              </h3>
-
-              <span className="text-red-600">
-                ★★★★★
-              </span>
-
-            </div>
-
-            <p className="text-gray-400">
-              Excelente producto.
-            </p>
-
-          </div>
-
-          <div className="bg-zinc-900 p-5 rounded-xl border border-zinc-800">
-
-            <div className="flex justify-between mb-3">
-
-              <h3 className="font-bold">
-                Usuario 2
-              </h3>
-
-              <span className="text-red-600">
-                ★★★★★
-              </span>
-
-            </div>
-
-            <p className="text-gray-400">
-              Muy recomendado.
-            </p>
-
-          </div>
-
-        </div>
-
-      </section>
-
     </main>
   )
 }

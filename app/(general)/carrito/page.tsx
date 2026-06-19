@@ -2,8 +2,9 @@
 
 import React, { useEffect } from 'react';
 import { useContextCarrito } from '@/app/Providers/ProvidersCarrito';
+import BotonPago from '@/app/componentes/BotonPago';
 
-export default function Page() {
+export default function carrito() {
   const { carrito, obtenerProductosCarrito, actualizarCantidad, eliminarDelCarrito } = useContextCarrito();
 
   useEffect(() => {
@@ -115,9 +116,7 @@ export default function Page() {
                 <span>Total:</span>
                 <span>L.{total.toFixed(2)}</span>
               </div>
-              <button className="w-full mt-6 bg-green-600 hover:bg-green-800 py-3 rounded-xl text-white font-bold transition">
-                Proceder al Pago
-              </button>
+              <BotonPago/>
             </div>
           </div>
         )}
